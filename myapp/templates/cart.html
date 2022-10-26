@@ -10,7 +10,7 @@
  {{object.price}}<br>
  {{object.availability}}<br>
 </div>
-<form method="GET" action ="http://127.0.0.1:8000/myapp/add/{{object.id}}/"> 
+<form method="GET" action ="{% url 'add' object.id %}"> 
 
 price : {{object.price}}<br>
 Quantity: <input type="number" name = 'quan'><br>

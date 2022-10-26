@@ -1,23 +1,24 @@
 <html>
+
 <h1>Products here</h1>
 
 {% for i in form%}
-{% if i.availability == True%}
+{% if i.availability == True %}
 
 <div>
 
-      <h3>{{i.brand}}</h3>
+      <h3>{{i.title}}</h3>
      Brand :{{i.brand}}<br>
      Image :<img src="{{ i.image.url }}" width="100" height="100"><br>
      Title :{{i.title}}<br>
      Price : {{i.price}}<br>
      Color : {{i.color}}<br>
      Availability : {{i.availability}}<br>
-     Add to Cart: {{i.id}}<button><a href="http://127.0.0.1:8000/myapp/co/{{i.id}}/">ADD to Cart</a></button><br>
+     Add to Cart: {{i.id}}<button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
 {% endif %}
 
 
 </div>
 {% endfor %}
-
+<button><a href = "{% url 'home' %}">Go back</a></button>
 </html>

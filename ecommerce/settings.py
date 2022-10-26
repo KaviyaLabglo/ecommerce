@@ -123,8 +123,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = ''
+MEDIA_URL = 'image/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
@@ -156,3 +157,5 @@ LOGGING = {
         },
     },
 }
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'

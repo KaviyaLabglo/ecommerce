@@ -2,13 +2,14 @@
 <h1>Products here</h1>
 
 {% for i in form %}
-
-<div>
-      <img src="{{media_url}}{{ i.product_id__image}}" width="100" height="100"><br>
+{% if i.is_active == True %}
+<div> 
+      
+      <img src="http://127.0.0.1:8000/image/{{i.product_id__image}}" width="100" height="100"><br>
       <h3>Product id is :{{i.product_id}}</h3>
       Your cart id is : {{i.id}}<br>
       Your price is :{{i.selling_price}}<br>
-
+{% endif %}
 {% endfor %}
 <br>
 <br>
@@ -16,5 +17,19 @@
    Your Total Price is :{{j}}
 {% endfor%}
 </div>
-<button>Order</button>
+<div>
+
+{% for i, j in Tax.items%} 
+   Your Tax Price is :{{j}}
+{% endfor%}
+</div>
+
+
+
+<div>
+{% for i,j in pass_id.items %}
+    <button><a href = "{% url 'order' j %}">Place to Order</a></buton>
+{% endfor %}
+</div>
+<br><button><a href = "{% url 'home' %}">Go back</a></button>
 </html>
