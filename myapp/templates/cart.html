@@ -13,10 +13,10 @@
 <form method="GET" action ="{% url 'add' object.id %}"> 
 
 price : {{object.price}}<br>
-Quantity: <input type="number" name = 'quan'><br>
+Quantity: <input type="number" name = 'quan' value=1><br>
 This order price is:{{object.price}}<br>
 
 <button>Submit</button> 
-{%endfor%}
+{% endfor %}
 </form>
 </html>

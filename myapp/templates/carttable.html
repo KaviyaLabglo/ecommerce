@@ -1,16 +1,19 @@
 <html>
-<h1>Products here</h1>
+<h1>My cart Products</h1>
 
-{% for i in form %}
-{% if i.is_active == True %}
-<div> 
+  {% for i in form %}
+    {% if i.is_active == True %}
+      <div> 
       
       <img src="http://127.0.0.1:8000/image/{{i.product_id__image}}" width="100" height="100"><br>
       <h3>Product id is :{{i.product_id}}</h3>
       Your cart id is : {{i.id}}<br>
       Your price is :{{i.selling_price}}<br>
-{% endif %}
-{% endfor %}
+      {{i.id}}
+      <button><a href="{% url 'cart_delete' i.id %}">Remove from cart</a></button><br><br>
+    {% endif %}
+    {% endfor %}
+
 <br>
 <br>
 {% for i, j in Sum.items%} 
@@ -22,7 +25,7 @@
 {% for i, j in Tax.items%} 
    Your Tax Price is :{{j}}
 {% endfor%}
-</div>
+
 
 
 
@@ -32,4 +35,7 @@
 {% endfor %}
 </div>
 <br><button><a href = "{% url 'home' %}">Go back</a></button>
+
+
+
 </html>

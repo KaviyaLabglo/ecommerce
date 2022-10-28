@@ -1,12 +1,14 @@
 <html>
+{% load static %}
+<h1>Your Products here</h1>
+<link rel="stylesheet" href="{% static 'mycss.css' %}">
+<head>
 
-<h1>Products here</h1>
-
+</head>
 {% for i in form%}
 {% if i.availability == True %}
 
-<div>
-
+<div class = "mydiv">
       <h3>{{i.title}}</h3>
      Brand :{{i.brand}}<br>
      Image :<img src="{{ i.image.url }}" width="100" height="100"><br>
@@ -15,10 +17,22 @@
      Color : {{i.color}}<br>
      Availability : {{i.availability}}<br>
      Add to Cart: {{i.id}}<button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
+ 
+     {% for l, j in wl.items %} 
+      
+        {%if i.id in j%}
+          <button>Already in wishlist</a></button><img src="{% static 'wl.jpeg' %}" width="30" height="30"><br><br><br>
+        {% else %}
+          <button><a href="{% url 'wishlist' i.id%}">Add to Whislist</a></button>
+        {% endif %}
+    {% endfor%}
+     
+     
 {% endif %}
 
 
 </div>
 {% endfor %}
-<button><a href = "{% url 'home' %}">Go back</a></button>
+<button><a href = "{% url 'home' %}">Go back</a></button><br>
+
 </html>

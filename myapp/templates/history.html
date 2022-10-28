@@ -1,0 +1,25 @@
+<html>
+<h1>Your order here</h1>
+{% if sel %}
+{% for i in sel %}
+
+<div> 
+   
+     
+      <img src="http://127.0.0.1:8000/image/{{i.product__product_id__image}}" width="100" height="100"><br><br>
+      
+      Quantity : {{i.product__quantity}}<br>
+      Price : {{i.product__selling_price}}<br><br><br>
+{% endfor %}
+{% else %}
+  <h3><i>Your order is null</i></h3>
+{% endif %}
+
+
+
+
+
+
+</div>
+<button><a href = "{% url 'home' %}">Go back</a></button><br>
+</html>

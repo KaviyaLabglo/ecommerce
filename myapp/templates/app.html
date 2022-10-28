@@ -1,7 +1,6 @@
 
 <h1>Welcome to Gadgets World</h1>
 
-
 <form method="POST" action="{% url 'viewpage' %}">
 {% csrf_token %}
 Search:<br>
@@ -9,7 +8,7 @@ Search:<br>
 <button>Submit</button>
 <button><a href="{% url 'logout'%}">Logout</a></button>
 <button><a href="{% url 'mycart' %}">My cart</a></button>
-<button>Order history</button>
+<button><a href = "{% url 'history' %}">Order history</a></button>
 </form>
 
 
@@ -37,4 +36,4 @@ Search:<br>
 {%endfor%}
 </tr>
 </table>
-
+<button><a href = "{% url 'mwl' %}">My wishlist</a></button>
