@@ -10,9 +10,9 @@ class add(admin.ModelAdmin):
 admin.site.register(cart,add)
 
 class ord(admin.ModelAdmin):
-    list_display = ('id','order_user', 'order_status')
+    list_display = ('id','order_user', 'order_status', 'order_date', 'shipping_address')
 admin.site.register(order,ord)
 
 class a(admin.ModelAdmin):
-    list_display = ('id','user1', 'product1','price', 'is_active1', )
+    list_display = ('id','user1', 'product1','price', 'is_active1' )
 admin.site.register(wishlist,a)
