@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
-
+DAY_CHOICES = (
+        ('Success', 'Success'),
+        ('Failure', 'Failure'),
+        ('In-progress', 'In-progress'),)
 class product(models.Model):
     brand = models.TextField(max_length = 100)
     image = models.ImageField(null = True, upload_to = 'image/')
@@ -26,7 +29,9 @@ class cart(models.Model):
 class  order(models.Model):
     order_user = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
     product = models.ManyToManyField(cart)
-    order_status = models.BooleanField(default= True) #User received the product it returns True --> false mean bending
+    order_status = models.CharField(default= 'Success',choices = DAY_CHOICES, max_length=200) #User received the product it returns True --> false mean bending
+    order_date = models.DateTimeField(auto_now_add=True,null = True)
+    shipping_address = models.TextField(max_length = 200, null = True)
    
     def __str__(self):
     	return "{} {} ".format(self.id, self.order_user, self.order_status)
@@ -36,6 +41,7 @@ class wishlist(models.Model):
     product1 = models.ForeignKey(product, on_delete=models.CASCADE, null = True)
     price = models.IntegerField(null=True)
     is_active1  = models.BooleanField(null = True, default = True)
+   
     
    
     

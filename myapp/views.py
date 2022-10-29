@@ -10,7 +10,7 @@ from django.contrib import messages
 from myapp.models import *
 from django.template import loader
 from django.db.models import Q, F
-import datetime
+from datetime import datetime
 import logging
 from django.contrib.auth.decorators import login_required
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ def show_products(request):
      a = []
      for i in w:
         a.append(i['product1'])
-     print(a)
+
      d = {'i':a}
      return render(request, 'product.html', {'form': show, 'wl':d})
      
@@ -66,30 +66,40 @@ def my_cart(request):
     i_d = current_user.id
     d ={'ID' : i_d}
     usre_id = User.objects.get(username= request.user)
-    cart_table = cart.objects.filter(user_id = usre_id.id).values('product_id__image', 'product_id', 'selling_price','id', 'user_id', 'is_active')
+    cart_table = cart.objects.filter(user_id = usre_id.id).values('product_id__image', 'product_id', 'selling_price','id', 'user_id', 'is_active','quantity')
    
     get_user = User.objects.get(username= request.user)
     total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
     tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity'))*0.18)
-    print(total_price)
-    # tax = total_price* 0.18
-    return render(request, 'carttable.html',{'form':cart_table, 'Sum':total_price, 'pass_id':d, 'Tax':tax})
+
+   
+    if tax['tot']:
+        total = total_price['tot'] + tax['tot']
+        to = {'total': total}
+    else :
+         total = 0
+         to = 0
+    
+    return render(request, 'carttable.html',{'form':cart_table, 'Sum':total_price, 'pass_id':d, 'Tax':tax,'total':to})
        
 def order_table(request,id):
+    print(id)
+    address = request.GET.get('ad')
+    city = request.GET.get('ci')
+    state = request.GET.get('st')
+    zipcode = request.GET.get('zi')
+    add = address+','+city+','+state+','+zipcode
     current_user = request.user
     get_user = User.objects.get(username= request.user)
     total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
     tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tax = Sum(F('selling_price') * F('quantity')) * 0.18)
-    print(tax)
     if tax['tax']:
-        car = cart.objects.filter(Q(user_id = current_user.id) & Q(is_active = True))
-        print(car)
-        s = order.objects.create(order_user =User.objects.get(id = current_user.id))
+        car = cart.objects.filter(Q(user_id = current_user.id) & Q(is_active = True))       
+        s = order.objects.create(order_user =User.objects.get(id = current_user.id), shipping_address = add)
         s.product.add(*car)
-        
         cart.objects.filter(user_id = id).update(is_active=False)
         ret = order.objects.filter(order_user = current_user.id)
-        print(ret)
+        
         return render(request, 'order.html',{'form':ret, 'sum':total_price, 'Tax':tax})
     else:
         return redirect('home')
@@ -97,12 +107,27 @@ def order_table(request,id):
 
 def order_history(request):
     current_user = request.user
-    sel = order.objects.filter(order_user = current_user).values('product__product_id__image', 'order_user', 'id', 'product__selling_price', 'product__quantity')
-    print(sel)
-    return render(request, 'history.html', {'sel': sel})
+    sel = order.objects.filter(order_user = current_user).values('product__product_id__image', 'order_user', 'id', 'product__selling_price', 'product__quantity', 'order_date')
+    
+    
+    pr = order.objects.filter(order_user = current_user.id).values('product__selling_price', 'product__quantity')
+    l = []
+    for i in pr:
+       l.append(i['product__selling_price']* i['product__quantity'])
+    price = sum(l)
+    tax = price * 0.18
+    total = tax+price
+    d = {'t':total}
+    
+    
+    return render(request, 'history.html', {'sel': sel, 'T':d})
+    
+def order_del(request,id):
+    dele = order.objects.get(id=id).delete()
+    return redirect('history')
     
        
-@login_required( login_url='login')
+
 def wish(request, id):
     print(id)
     product_id = int(id)
@@ -135,4 +160,20 @@ def wl_form(request, id):
     return render(request, 'cart.html',{'object_list':select_item})
          
    
+def shipping(request, id):
+    a = cart.objects.filter(Q(user = id) & Q(is_active = True)).values('product_id', 'product_id__image', 'selling_price', 'user')
+    print(a)
+    current_user = request.user
+    
+    get_user = User.objects.get(username= request.user)
+    total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
+    tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tax = Sum(F('selling_price') * F('quantity')) * 0.18)
+    return render(request, 'shipping.html',{'form':a, 'sum':total_price, 'Tax':tax})
+    
+   
+
+    
+    
+    
+    
    

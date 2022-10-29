@@ -16,7 +16,7 @@
      Price : {{i.price}}<br>
      Color : {{i.color}}<br>
      Availability : {{i.availability}}<br>
-     Add to Cart: {{i.id}}<button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
+     <button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
  
      {% for l, j in wl.items %} 
       
