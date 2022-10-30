@@ -11,8 +11,9 @@
       
       Quantity : {{i.product__quantity}}<br>
       Price : {{i.product__selling_price}}<br>
-      Date & Time : {{i.order_date}}
-      {{i.id}}<br>
+      Date & Time : {{i.created_on}}<br>
+      Total : {{i.total_order_value}}<br>
+      <br>
       <button><a href ="{% url 'order_del' i.id %}">Cancel order</a></button><br><br>
       
 {% endfor %}

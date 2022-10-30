@@ -5,6 +5,7 @@
 <head>
 
 </head>
+
 {% for i in form%}
 {% if i.availability == True %}
 
@@ -17,13 +18,20 @@
      Color : {{i.color}}<br>
      Availability : {{i.availability}}<br>
      <button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
- 
      {% for l, j in wl.items %} 
+     
+     <form action = "{% url 'wishlist' i.id%}" method="POST">
+     
+     {% csrf_token %} 
+     
       
-        {%if i.id in j%}
-          <button>Already in wishlist</a></button><img src="{% static 'wl.jpeg' %}" width="30" height="30"><br><br><br>
+        {%if i.id not in j%}
+          <button type = 'submit'>Add to Whislist</button>
+          
         {% else %}
-          <button><a href="{% url 'wishlist' i.id%}">Add to Whislist</a></button>
+          <button>Already in wishlist</a></button><img src="{% static 'wl.jpeg' %}" width="30" height="30"><br><br><br>
+          
+       </form>
         {% endif %}
     {% endfor%}
      

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
-#from myapp.views import *
+from myapp.views import *
 
 
 urlpatterns = [
@@ -25,6 +25,7 @@ urlpatterns = [
     path('myapp/', include('myapp.urls')),
    #path('',login_page, name= 'login'),
     path('', include('django.contrib.auth.urls')),
+    path("register/",register, name="register"),
      
 ]
 if settings.DEBUG:
