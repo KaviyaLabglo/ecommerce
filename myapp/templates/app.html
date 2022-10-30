@@ -1,5 +1,8 @@
+{% load static %}
+<div>
+<img src="{% static 'gadget.png' %}" width="100" height="100"><h1>Welcome to Gadgets World</h1><br></div>
 
-<h1>Welcome to Gadgets World</h1>
+
 
 <form method="POST" action="{% url 'viewpage' %}">
 {% csrf_token %}
