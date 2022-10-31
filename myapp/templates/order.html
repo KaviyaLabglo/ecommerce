@@ -1,9 +1,10 @@
 <h2>Your order has been received</h2>
-{% for i in form %}
+{% for i in form%}
+ <h1>My latest order is </h1>
 
 <div>
-     {{i.order_user}}
-     {{i.id}} 
+   <img src="http://127.0.0.1:8000/image/{{i.product__product_id__image}}" width="100" height="100"><br>
+     
 </div>
 {% endfor %}
 
