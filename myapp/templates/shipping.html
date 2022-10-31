@@ -1,5 +1,6 @@
 <html>
-
+<form method="POST">
+   {% csrf_token %}
 <h1>Welcome</h1>
 {% for i in form %}
   {{i.product_id}}
@@ -21,11 +22,11 @@
 
 
 <div>
+</form>
 
-
-<form action =  "{% url 'order' i.user  %}">
+<form method="POST" action =  "{% url 'order' i.user  %}">
 {% endfor %}
-     
+   {% csrf_token %}
     Address: <input type="text" name="ad" required ><br><br>
     City : <input type="text" name="ci"required ><br><br>
     State :<input type="text" name="st" required><br><br>
@@ -37,4 +38,5 @@
 </form>
 
 </div>
+
 </html>
