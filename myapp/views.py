@@ -1,23 +1,17 @@
-import re
 from django.views.generic.list import ListView
 
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from matplotlib.style import available
+from matplotlib.style import context
 from myapp.models import *
-from django.template import loader
 
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib import messages
+from django.contrib.auth import login
 
-from django.db.models import Min, Max, Count, Avg, Sum
+from django.db.models import Sum
 from django.db.models import Q, F
-from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+
 
  
 class product_list(ListView):
@@ -31,44 +25,37 @@ class product_list(ListView):
         s=super().get_context_data(**kwargs)
         wishlist_items = wishlist.objects.filter(user1 = self.request.user.id).values('product1')
         List = []
-    
         for i in wishlist_items:
             List.append(i['product1'])
-        s['content'] =List
-        print("kuygruf feudfsgsefh ",s)
+        s['content'] =List 
+        print(s)
         return s
 
 def show_products(request):
      search_content = request.POST.get('content')
-     print(search_content)
      show = product.objects.filter( Q(availability = True) & Q(brand__brand_name__istartswith= search_content) | Q(title__istartswith =  search_content))
-     print(show)
      wishlist_items = wishlist.objects.filter(user1 = request.user.id).values('product1')
      List = []
-    
      for i in wishlist_items:
         List.append(i['product1'])
-    
      content = {'i':List}
      return render(request, 'product.html', {'form': show, 'wl':content})
      
      
-    
-def cart_form(request, id):
-    select_item = product.objects.filter(id=id)
+
+def cart_form(request, id1):
+    print(request.method)
+    select_item = product.objects.filter(id=id1)
     return render(request, 'cart.html',{'object_list':select_item})
     
     
 @login_required       
-def add(request, id):
-   
+def cart_add(request, id):
     if request.method == 'POST':
         quan_tity = request.POST.get('quan')
-
         product_id = int(id)
         get_price = product.objects.get(id =id)
         price = get_price.price
-    
         usre_id = User.objects.get(username= request.user)
         a = cart(user = User.objects.get(id= usre_id.id), product = product.objects.get(id =id), quantity = quan_tity, selling_price = price, addcart_by = request.user) 
         cart_table = cart.objects.filter(user_id = usre_id)
@@ -79,8 +66,19 @@ def add(request, id):
         #return render(request, 'carttable.html',{'form':cart_table,'Sum':total_price, 'Tax':tax})
 
 
+
+def cart_update(request, id):
+    if request.method == 'POST':
+        qn = request.POST.get('qn')
+        cart.objects.update(quantity = int(qn))
+        return redirect('mycart')
+        
+        
+        
+    
+    
+    
 def cart_del(request,id):
-    print(request.method)
     if request.method =='POST':
         dele = cart.objects.get(id=id).delete()
         return redirect('mycart')
@@ -93,24 +91,18 @@ def my_cart(request):
     d ={'ID' : i_d}
     usre_id = User.objects.get(username= request.user)
     cart_table = cart.objects.filter(user_id = usre_id.id).values('product_id__image', 'product_id', 'selling_price','id', 'user_id', 'is_active','quantity')
-    
     get_user = User.objects.get(username= request.user)
     total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
     tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity'))*0.18)
-
-   
     if tax['tot']:
         total = total_price['tot'] + tax['tot']
         to = {'total': total}
     else :
          total = 0
          to = 0
-   
     return render(request, 'carttable.html',{'form':cart_table, 'Sum':total_price, 'pass_id':d, 'Tax':tax,'total':to})
        
 def order_table(request,id):
-    print(request.method)
-    
     if request.method == 'POST':
         address = request.POST.get('ad')
         city = request.POST.get('ci')
@@ -120,9 +112,9 @@ def order_table(request,id):
         current_user = request.user
         get_user = User.objects.get(username= request.user)
         total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
-        print(total_price)
+        
         tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tax = Sum(F('selling_price') * F('quantity')) * 0.18)
-        print(tax)
+        
         if tax['tax']:
             car = cart.objects.filter(Q(user_id = current_user.id) & Q(is_active = True))       
             s = order.objects.create(order_user =User.objects.get(id = current_user.id), shipping_address = add, total_product_price = total_price['tot'],  total_tax = tax['tax'], total_order_value =total_price['tot'] + tax['tax'] )
@@ -130,11 +122,10 @@ def order_table(request,id):
             cart.objects.filter(user_id = id).update(is_active=False)
             
             ret1 = order.objects.filter(order_user = current_user.id).values('id').last()
-            print(ret1['id'])
+           
             ret = order.objects.filter(id = ret1['id']).values('product__product_id__image')
 
-            print(ret)
-            print(tax)
+            
         
             return render(request, 'order.html',{'form':ret, 'sum':total_price, 'Tax':tax})
         else:
@@ -143,25 +134,64 @@ def order_table(request,id):
 @login_required
 def order_history(request):
     current_user = request.user
-    sel = order.objects.filter(order_user = current_user).values()
-    print(sel)
+    sel = order.objects.filter(order_user = current_user).values('product__product_id__image', 'order_user', 'id', 'product__selling_price', 'product__quantity', 'created_on', 'total_order_value', 'product__id')
+ 
     #values('product__product_id__image', 'order_user', 'id', 'product__selling_price', 'product__quantity', 'created_on', 'total_order_value', 'product__id')
-    return render(request, 'history.html', {'sel': sel})
-def order_del(request,id):
+    pr = order.objects.filter(order_user = current_user.id).values('product__selling_price', 'product__quantity')
+    l = [] 
+    if pr:
+        for i in pr:
+            if i['product__selling_price'] is not None:
+                l.append(i['product__selling_price']* i['product__quantity'])
+    else:
+        l = [0,0]
+    
+    price = sum(l)
+    tax = price * 0.18
+    total = tax+price
+    d = {'t':total}
+    return render(request, 'history.html', {'sel': sel, 'T':d})
+def order_del(request,id1,id2):
     if request.method == 'POST':
-        dele = cart.objects.get(id = id).delete()
-        print(dele)
+        print(id2)
+        print(id1)
+        d = cart.objects.get(id = id1)
+
+        current_user = request.user
+        dele = cart.objects.get(id = id1).delete()
+        pr = order.objects.filter(order_user = current_user.id).values('product__selling_price', 'product__quantity')
+        print(pr)
+        l = [] 
+        if pr:
+            for i in pr:
+                if i['product__selling_price'] is not None:
+                    l.append(i['product__selling_price']* i['product__quantity'])
+        else:
+            l = [0,0]
+    
+        price = sum(l)
+        tax = price * 0.18
+        total = tax+price
+        d = {'t':total}
+        
+        
+        print(total)
+        a = order.objects.filter(id = id2).update(total_order_value= total, total_product_price = price, total_tax = tax)
+        print(a)
+        if total==0:
+            order.objects.filter(id = id2).update(order_status = 0)
+            
+            
         return redirect('history')
     
        
 @login_required  
 def add_wish(request, id):
+    print(id)
     if request.method == 'POST':
-        product_id = int(id)
         get_price = product.objects.get(id =id)
         price = get_price.price
-        a = wishlist.objects.filter (user1 = request.user).values('product1')
-        print(a)
+        a = wishlist.objects.filter(Q(user1 = request.user) & Q(product1 = id))
         usre_id = User.objects.get(username= request.user)
         if a :
             print('Do not save')
@@ -186,21 +216,10 @@ def wishlist_del(request,id):
         dele = wishlist.objects.get(id=id).delete()
         return redirect('mwl')
 
-def wl_form(request, id):
-    print("HII")
-    select_item = product.objects.filter(id=id)
-    return render(request, 'cart.html',{'object_list':select_item})
-         
-  
 def shipping(request, id):
-    print(request.method)
-    print(1)
-    if request.method == "POST":
-        print(2)
+    if request.method == "POST":    
         a = cart.objects.filter(Q(user = id) & Q(is_active = True)).values('product_id', 'product_id__image', 'selling_price', 'user')
-        print(a)
         current_user = request.user
-    
         get_user = User.objects.get(username= request.user)
         total_price = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tot = Sum(F('selling_price') * F('quantity')))
         tax = cart.objects.filter(Q(user_id= get_user.id) & Q(is_active = True)).aggregate(tax = Sum(F('selling_price') * F('quantity')) * 0.18)
@@ -210,7 +229,6 @@ def shipping(request, id):
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from myapp.form import CustomUserCreationForm
-
 
 def register(request):
     if request.method == "GET":

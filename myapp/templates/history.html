@@ -1,37 +1,50 @@
 <html>
 <h1>My order here</h1>
+
 {% if sel %}
-{% for i in sel %}
-{{i.product__id}}
+  {% for i in sel %}
 
-<div> 
+
+
+
+   <div> 
    
-     
-      <img src="http://127.0.0.1:8000/image/{{i.product__product_id__image}}" width="100" height="100"><br><br>
+     {% if i.product__quantity %}
+          <img src="http://127.0.0.1:8000/image/{{i.product__product_id__image}}" width="100" height="100"><br><br>
       
-      Quantity : {{i.product__quantity}}<br>
-      Price : {{i.product__selling_price}}<br>
-      Date & Time : {{i.created_on}}<br>
-      Total : {{i.total_order_value}}<br>
-      <br>
-      <form action="" method="post">
-        {% csrf_token %}
-      <button type="submit">Cancel order</button><br><br></form>
-      
-{% endfor %}
-{% for v, k in T.items %}
- Your total amount is : {{k}}
-{% endfor %}
+          Quantity : {{i.product__quantity}}<br>
+          Price : {{i.product__selling_price}}<br>
+          Date & Time : {{i.created_on}}<br>
+          Total : {{i.total_order_value}}<br>
+      {% endif %}
+       <br>
+      {% if i.product__id%}
+          <form action="{% url 'order_del' i.product__id i.id %}" method="post">
+            {% csrf_token %}
+          <button type="submit">Cancel order</button><br><br></form>
+      {% endif %}
+    </div>
+
+  {% endfor %}
+    
+
+    {% for v, k in T.items %}
+          Your total amount is : {{k}}
+    {% endfor %}
+    <button><a href = "{% url 'home' %}">Go back</a></button><br>
+
 {% else %}
+
   <h3><i>Your order is null</i></h3>
+  <br><br>
+  <button><a href = "{% url 'home' %}">Go back</a></button><br>
+
 {% endif %}
+   
 
-
-
-
-
-
-</div>
-<br><br>
-<button><a href = "{% url 'home' %}">Go back</a></button><br>
 </html>
+
+
+
+
+

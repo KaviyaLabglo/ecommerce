@@ -1,4 +1,6 @@
 from distutils.command.upload import upload
+from operator import mod
+from pyexpat import model
 from unittest.util import _MAX_LENGTH
 from django.db import models
 from django.contrib.auth.models import User
@@ -43,6 +45,7 @@ class cart(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    updated_quantity = models.IntegerField(null = True)
     selling_price = models.IntegerField()
     is_active  = models.BooleanField(default = True)
     addcart_by = models.CharField(max_length = 200)

@@ -6,7 +6,7 @@ class S(admin.ModelAdmin):
 admin.site.register(product,S)
 
 class add(admin.ModelAdmin):
-    list_display = ('id','user', 'product_id', 'quantity','selling_price', 'is_active', 'created_on')
+    list_display = ('id','user', 'product_id', 'quantity','selling_price', 'is_active', 'created_on', 'updated_quantity')
 admin.site.register(cart,add)
 
 class ord(admin.ModelAdmin):
