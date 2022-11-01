@@ -1,15 +1,15 @@
 <html>
 {% load static %}
 <h1>Your Products here</h1>
-<link rel="stylesheet" href="{% static 'mycss.css' %}">
+<link rel="stylesheet" href="{% static 'my.css' %}">
 <head>
 
 </head>
 
 {% for i in form%}
 {% if i.availability == True %}
-
-<div class = "mydiv">
+<center>
+<div>
       <h3>{{i.title}}</h3>
      Brand :{{i.brand}}<br>
      Image :<img src="{{ i.image.url }}" width="100" height="100"><br>
@@ -17,7 +17,8 @@
      Price : {{i.price}}<br>
      Color : {{i.color}}<br>
      Availability : {{i.availability}}<br>
-     <button><a href="{% url 'cf' i.id%}">ADD to Cart</a></button><br>
+     Tax : 18 %<br>
+     <button><a href="{% url 'addcart' i.id%}">ADD to Cart</a></button><br>
      {% for l, j in wl.items %} 
      
      <form action = "{% url 'wishlist' i.id%}" method="POST">
@@ -40,6 +41,8 @@
 
 
 </div>
+
+</center>
 {% endfor %}
 <button><a href = "{% url 'home' %}">Go back</a></button><br>
 

@@ -10,7 +10,12 @@
       Your cart id is : {{i.id}}<br>
       
       {{i.quantity}}
-      Quantity : <input type="number" value="{{i.quantity}}" name= 'qn'><br><br>
+      <form method="POST" action="{% url 'quantity' i.product_id %}">
+         {% csrf_token %}
+      Quantity : <input type="number" value="{{i.quantity}}" name= 'qn'>
+      <button>Apply</button>
+      
+      </form><br><br>
       
       <form method = 'POST' action="{% url 'cart_delete' i.id %}">
          {% csrf_token %}
