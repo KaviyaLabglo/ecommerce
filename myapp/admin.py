@@ -20,3 +20,10 @@ admin.site.register(wishlist,a)
 class b(admin.ModelAdmin):
     list_display = ('id','brand_name', 'brand_logo', 'year', 'founder')
 admin.site.register(Brand,b)
+
+
+class cartAdmin(admin.ModelAdmin):
+   raw_id_fields = ('user', 'product',)
+   autocomplete_lookup_fields = {
+   'fk': ['user','product'],
+   }

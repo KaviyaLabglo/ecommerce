@@ -1,5 +1,8 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'my.css' %}">
+<html>
+  <link rel="stylesheet" href="{% static 'new.css' %}">
+<body>
+
 
 <img style="display: inline;" src="{% static 'gadget.png' %}" width="100" height="100">
 <h1 style="display: inline;">Welcome to Gadgets World</h1><br></div>
@@ -18,7 +21,7 @@
 
 
 
-
+<center>
 <table border="1px solid black">
   <tr>
     <th>ID</th>
@@ -65,8 +68,10 @@
     {% endfor%}
   </tr>
 </table>
-
+</center>
 
 
 
 <button><a href="{% url 'mwl' %}">My wishlist</a></button>
+</body>
+</html>

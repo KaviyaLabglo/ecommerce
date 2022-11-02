@@ -2,15 +2,18 @@
 <h1>My cart Products</h1>
 
   {% for i in form %}
+  
     {% if i.is_active == True %}
+    
       <div> 
       
       <img src="http://127.0.0.1:8000/image/{{i.product_id__image}}" width="100" height="100"><br>
       <h3>Product id is :{{i.product_id}}</h3>
       Your cart id is : {{i.id}}<br>
       
-      {{i.quantity}}
+      
       <form method="POST" action="{% url 'quantity' i.product_id %}">
+         {{i.product_id}}
          {% csrf_token %}
       Quantity : <input type="number" value="{{i.quantity}}" name= 'qn'>
       <button>Apply</button>
@@ -24,23 +27,32 @@
     {% endif %}
     {% endfor %}
 
-<br>
-<br>
+      <br>
+    <br>
 
 
 {% for i, j in Sum.items%} 
+ {% if j is not None %}
    Your Product Price is :{{j}}
+ {% endif %}
 {% endfor%}
 
 <div>
 
 {% for i, j in Tax.items%} 
+  {% if j is not None %} 
    Your Tax Price is :{{j}}
+  {% else %}
+  Your cart is empty
+  
+   {% endif %}
 {% endfor%}
 <br><br>
 {% for v, k in total.items%} 
    Your Total Price is :{{k}}
+   
 {% endfor%}
+
 
 
 <div>
@@ -59,6 +71,7 @@
     
    
 {% endfor %}
+
 </form>
 
 </div>
