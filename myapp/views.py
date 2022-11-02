@@ -28,7 +28,7 @@ class product_list(ListView):
         for i in wishlist_items:
             List.append(i['product1'])
         s['content'] =List 
-        print(s)
+        
         return s
 
 def show_products(request):
@@ -42,9 +42,9 @@ def show_products(request):
      return render(request, 'product.html', {'form': show, 'wl':content})
      
      
-
+@login_required 
 def cart_form(request, id1):
-    print(request.method)
+    print(id1)
     select_item = product.objects.filter(id=id1)
     return render(request, 'cart.html',{'object_list':select_item})
     
@@ -68,9 +68,10 @@ def cart_add(request, id):
 
 
 def cart_update(request, id):
+    print(id)
     if request.method == 'POST':
         qn = request.POST.get('qn')
-        cart.objects.update(quantity = int(qn))
+        cart.objects.filter(product = id).update(quantity = int(qn))
         return redirect('mycart')
         
         
@@ -153,14 +154,11 @@ def order_history(request):
     return render(request, 'history.html', {'sel': sel, 'T':d})
 def order_del(request,id1,id2):
     if request.method == 'POST':
-        print(id2)
         print(id1)
-        d = cart.objects.get(id = id1)
-
-        current_user = request.user
+        print(id2)
+        current_user = request.user.id
         dele = cart.objects.get(id = id1).delete()
-        pr = order.objects.filter(order_user = current_user.id).values('product__selling_price', 'product__quantity')
-        print(pr)
+        pr = order.objects.filter(order_user = current_user).values('product__selling_price', 'product__quantity')
         l = [] 
         if pr:
             for i in pr:
@@ -173,11 +171,7 @@ def order_del(request,id1,id2):
         tax = price * 0.18
         total = tax+price
         d = {'t':total}
-        
-        
-        print(total)
         a = order.objects.filter(id = id2).update(total_order_value= total, total_product_price = price, total_tax = tax)
-        print(a)
         if total==0:
             order.objects.filter(id = id2).update(order_status = 0)
             
@@ -187,14 +181,12 @@ def order_del(request,id1,id2):
        
 @login_required  
 def add_wish(request, id):
-    print(id)
     if request.method == 'POST':
         get_price = product.objects.get(id =id)
         price = get_price.price
         a = wishlist.objects.filter(Q(user1 = request.user) & Q(product1 = id))
         usre_id = User.objects.get(username= request.user)
         if a :
-            print('Do not save')
             pass
         else:
             p = wishlist(user1 = User.objects.get(id= usre_id.id), product1 = product.objects.get(id =id),  price = price)

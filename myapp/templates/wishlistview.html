@@ -16,7 +16,8 @@
 
 
 
-   <form method="post" action="{% url 'wlf' i.product1__id %}">
+   <form method="post" action="{% url 'addcart' i.product1__id %}">
+      
        {% csrf_token %}
        
        <button>ADD to Cart</button>

@@ -1,0 +1,17 @@
+body {
+  background-color:skyblue;
+  font-family: verdana;
+  align-items: center;
+  text-align: center;
+}
+
+div {
+
+  border: 1px solid red;
+ 
+  width: 300px;
+  padding: 50px;
+  margin: 20px;
+  display:inline-block;
+  vertical-align:middle;
+}

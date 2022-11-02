@@ -1,11 +1,24 @@
 <html>
 {% load static %}
 <h1>Your Products here</h1>
-<link rel="stylesheet" href="{% static 'my.css' %}">
+<link rel="stylesheet" href="{% static 'new.css' %}">
 <head>
-
+<style>
+  body{
+    background-color: skyblue;
+  }
+  div{
+    border: 1px solid red;
+ 
+    width: 300px;
+    padding: 50px;
+    margin: 20px;
+    display:inline-block;
+    vertical-align:middle;
+  }
+</style>
 </head>
-
+<body>
 {% for i in form%}
 {% if i.availability == True %}
 <center>
@@ -24,10 +37,9 @@
      <form action = "{% url 'wishlist' i.id%}" method="POST">
      
      {% csrf_token %} 
-     
-      
+    
         {%if i.id not in j%}
-          <button type = 'submit'>Add to Whislist</button>
+          <button type = 'submit'>Add to Whislist</button><img src="{% static 'x.png' %}" width="30" height="30"
           
         {% else %}
           <button>Already in wishlist</a></button><img src="{% static 'wl.jpeg' %}" width="30" height="30"><br><br><br>
@@ -45,5 +57,5 @@
 </center>
 {% endfor %}
 <button><a href = "{% url 'home' %}">Go back</a></button><br>
-
+</body>
 </html>
