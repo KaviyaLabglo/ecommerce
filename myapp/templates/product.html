@@ -21,6 +21,7 @@
 <body>
 {% for i in form%}
 {% if i.availability == True %}
+
 <center>
 <div>
       <h3>{{i.title}}</h3>
@@ -33,19 +34,22 @@
      Tax : 18 %<br>
      <button><a href="{% url 'addcart' i.id%}">ADD to Cart</a></button><br>
      {% for l, j in wl.items %} 
-     
-     <form action = "{% url 'wishlist' i.id%}" method="POST">
-     
-     {% csrf_token %} 
+       {%if i.id not in j%}
+         <form action = "{% url 'wishlist' i.id%}" method="POST">
+          {{i}}
+              {% csrf_token %} 
     
-        {%if i.id not in j%}
+        
           <button type = 'submit'>Add to Whislist</button><img src="{% static 'x.png' %}" width="30" height="30"
-          
-        {% else %}
-          <button>Already in wishlist</a></button><img src="{% static 'wl.jpeg' %}" width="30" height="30"><br><br><br>
-          
-       </form>
-        {% endif %}
+         </form>
+     {% else %}
+      <form method="POST" action="{% url 'delwl' i.id %}">
+         {% csrf_token %}
+         {{i.id}}
+          <button>Already in wishlist</a></button><img src="{% static 'a.jpeg' %}" width="30" height="30"><br><br><br>
+      </form>
+       
+      {% endif %}
     {% endfor%}
      
      

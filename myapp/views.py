@@ -23,7 +23,7 @@ class product_list(ListView):
         return a 
     def get_context_data(self, **kwargs):
         s=super().get_context_data(**kwargs)
-        wishlist_items = wishlist.objects.filter(user1 = self.request.user.id).values('product1')
+        wishlist_items = wishlist.objects.filter(user1 = self.request.user.id).values('product1','id')
         List = []
         for i in wishlist_items:
             List.append(i['product1'])
@@ -192,7 +192,7 @@ def add_wish(request, id):
             p = wishlist(user1 = User.objects.get(id= usre_id.id), product1 = product.objects.get(id =id),  price = price)
             p.save()
     
-    return redirect('mwl')
+    return redirect('home')
    
     
 @login_required
@@ -205,8 +205,8 @@ def my_wishlist(request):
     
 def wishlist_del(request,id):
     if request.method == 'POST':
-        dele = wishlist.objects.get(id=id).delete()
-        return redirect('mwl')
+        dele = wishlist.objects.filter(Q(id=id) | Q(product1 = id)).delete()
+        return redirect('home')
 
 def shipping(request, id):
     if request.method == "POST":    
@@ -223,16 +223,21 @@ from django.urls import reverse
 from myapp.form import CustomUserCreationForm
 
 def register(request):
+    print(request.method)
     if request.method == "GET":
-        return render(
-            request, "registration/register.html",
-            {"form": CustomUserCreationForm})
+        return render(request, "registration/register.html",{"form": CustomUserCreationForm})
     elif request.method == "POST":
-        form = CustomUserCreationForm(request.POST or None)
+        form = CustomUserCreationForm(request.POST)
+        print(1)
         if form.is_valid():
+            print('Hi')
             user = form.save()
             login(request, user)
             return redirect(reverse("login")) 
+        else:
+            form = CustomUserCreationForm()
+        
+    return render(request,'registration/register.html',{'form':form})
 
     
     
