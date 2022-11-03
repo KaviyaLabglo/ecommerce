@@ -15,8 +15,7 @@
       {% endif %}
        <br>
       {% if i.product__id%}
-      {{i.id}}
-      {{i.product__id}}
+      
           <form action="{% url 'order_del' i.product__id i.id %}" method="post">
             {% csrf_token %}
           <button type="submit">Cancel order</button><br><br></form>

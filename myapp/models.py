@@ -28,7 +28,7 @@ class Brand(TimeStampModel):
     year = models.IntegerField()
     founder = models.CharField(max_length = 200)
     def __str__(self):
-    	return "{} ".format(self.brand_name)
+    	return "{}".format(self.brand_name)
      
 class product(TimeStampModel):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -50,7 +50,7 @@ class cart(TimeStampModel):
     is_active  = models.BooleanField(default = True)
     addcart_by = models.CharField(max_length = 200)
     def __str__(self):
-    	return "{} ".format(self.product)
+    	return "{} ".format(self.id)
     
     
     
@@ -62,6 +62,10 @@ class  order(TimeStampModel):
     total_product_price = models.IntegerField()
     total_tax =  models.IntegerField()
     total_order_value =  models.IntegerField()
+    
+    @staticmethod
+    def autocomplete_search_fields():
+        return ("order_user", "product",)
    
     def __str__(self):
     	return "{} {} ".format(self.id, self.order_user, self.order_status)

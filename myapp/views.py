@@ -157,7 +157,10 @@ def order_del(request,id1,id2):
         print(id1)
         print(id2)
         current_user = request.user.id
-        dele = cart.objects.get(id = id1).delete()
+        a = cart.objects.get(id=id1)
+        b = order.objects.get(id = id2)
+        b.product.remove(a)
+
         pr = order.objects.filter(order_user = current_user).values('product__selling_price', 'product__quantity')
         l = [] 
         if pr:

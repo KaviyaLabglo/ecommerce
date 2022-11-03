@@ -40,13 +40,13 @@
               {% csrf_token %} 
     
         
-          <button type = 'submit'>Add to Whislist</button><img src="{% static 'x.png' %}" width="30" height="30"
+          <button type = 'submit' style="background-color: white;">Add to Whislist</button><img src="{% static 'x.png' %}" width="30" height="30"
          </form>
      {% else %}
       <form method="POST" action="{% url 'delwl' i.id %}">
          {% csrf_token %}
          {{i.id}}
-          <button>Already in wishlist</a></button><img src="{% static 'a.jpeg' %}" width="30" height="30"><br><br><br>
+          <button style="background-color: white;">Already in wishlist</a></button><img src="{% static 'a.jpeg' %}" width="30" height="30"><br><br><br>
       </form>
        
       {% endif %}
