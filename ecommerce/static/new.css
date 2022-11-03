@@ -1,5 +1,5 @@
 body {
-  background-color:white;
+  background-color: white;
   font-family: verdana;
   align-items: center;
   text-align: center;
@@ -12,6 +12,6 @@ div {
   width: 300px;
   padding: 50px;
   margin: 20px;
-  display:inline-block;
-  vertical-align:middle;
+  display: inline-block;
+  vertical-align: middle;
 }
