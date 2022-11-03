@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+
 from pickle import TRUE 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -150,6 +151,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 
+
+
+from django.conf import settings
 GRAPPELLI_ADMIN_TITLE = 'Kaviya'
-#GRAPPELLI_SWITCH_USER = False
-#GRAPPELLI_SWITCH_USER_ORIGINAL = False
+GRAPPELLI_SWITCH_USER = True
+
+ADMIN_HEADLINE = getattr(settings, "GRAPPELLI_ADMIN_HEADLINE", 'Grappelli')
+ADMIN_TITLE = getattr(settings, "GRAPPELLI_ADMIN_TITLE", 'Grappelli')
+
+
+
+
+ADMIN_URL = getattr(settings, "GRAPPELLI_ADMIN_URL", '/admin')
+
+AUTOCOMPLETE_SEARCH_FIELDS = getattr(settings, "GRAPPELLI_AUTOCOMPLETE_SEARCH_FIELDS", {})
+AUTOCOMPLETE_LIMIT = getattr(settings, "GRAPPELLI_AUTOCOMPLETE_LIMIT", 10)
+
+
+SWITCH_USER = getattr(settings, "GRAPPELLI_SWITCH_USER", True)
+SWITCH_USER_ORIGINAL = getattr(settings, "GRAPPELLI_SWITCH_USER_ORIGINAL", lambda user: user.is_superuser)
+SWITCH_USER_TARGET = getattr(settings, "GRAPPELLI_SWITCH_USER_TARGET", lambda original_user, user: user.is_staff and not user.is_superuser)
+SWITCH_USER_REGEX = getattr(settings, "GRAPPELLI_SWITCH_USER_REGEX", "\d+")
+
+
+CLEAN_INPUT_TYPES = getattr(settings, "GRAPPELLI_CLEAN_INPUT_TYPES", True)
