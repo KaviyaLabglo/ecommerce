@@ -153,7 +153,7 @@ LOGOUT_REDIRECT_URL = 'login'
 
 
 
-from django.conf import settings
+'''from django.conf import settings
 GRAPPELLI_ADMIN_TITLE = 'Kaviya'
 GRAPPELLI_SWITCH_USER = True
 
@@ -175,4 +175,4 @@ SWITCH_USER_TARGET = getattr(settings, "GRAPPELLI_SWITCH_USER_TARGET", lambda or
 SWITCH_USER_REGEX = getattr(settings, "GRAPPELLI_SWITCH_USER_REGEX", "\d+")
 
 
-CLEAN_INPUT_TYPES = getattr(settings, "GRAPPELLI_CLEAN_INPUT_TYPES", True)
+CLEAN_INPUT_TYPES = getattr(settings, "GRAPPELLI_CLEAN_INPUT_TYPES", True)'''
