@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import os
 
-from pickle import TRUE 
+from pickle import TRUE
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
-    
+
 ]
 
 MIDDLEWARE = [
@@ -83,11 +83,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'myapp',
-        'HOST' :'localhost',
-        'USER':'root',
-        'PORT':'3306',
-        'PASSWORD' : 'password',
-   
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PORT': '3306',
+        'PASSWORD': 'password',
+
     }
 }
 
@@ -131,7 +131,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 
-
 MEDIA_URL = 'image/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '')
 
@@ -144,13 +143,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
-
-
-
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
-
 
 
 '''from django.conf import settings

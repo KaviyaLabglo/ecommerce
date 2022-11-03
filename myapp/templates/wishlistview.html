@@ -8,7 +8,7 @@
    <img src="http://127.0.0.1:8000/image/{{i.product1__image}}" width="100" height="100"><br>
    Price : {{i.product1__price}}<br><br>
 
-  
+
    <form method="post" action="{% url 'delwl' i.id %}">
       {% csrf_token %}
       <button>Remove</button><br><br>
@@ -17,10 +17,10 @@
 
 
    <form method="post" action="{% url 'addcart' i.product1__id %}">
-      
-       {% csrf_token %}
-       
-       <button>ADD to Cart</button>
+
+      {% csrf_token %}
+
+      <button>ADD to Cart</button>
    </form>
 </div>
 

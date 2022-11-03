@@ -2,64 +2,69 @@
 {% load static %}
 <h1>Your Products here</h1>
 <link rel="stylesheet" href="{% static 'new.css' %}">
+
 <head>
-<style>
-  body{
-    background-color: skyblue;
-  }
-  div{
-    border: 1px solid red;
- 
-    width: 300px;
-    padding: 50px;
-    margin: 20px;
-    display:inline-block;
-    vertical-align:middle;
-  }
-</style>
+  <style>
+    body {
+      background-color: skyblue;
+    }
+
+    div {
+      border: 1px solid red;
+
+      width: 300px;
+      padding: 50px;
+      margin: 20px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
 </head>
+
 <body>
-{% for i in form%}
-{% if i.availability == True %}
+  {% for i in form%}
+  {% if i.availability == True %}
 
-<center>
-<div>
+  <center>
+    <div>
       <h3>{{i.title}}</h3>
-     Brand :{{i.brand}}<br>
-     Image :<img src="{{ i.image.url }}" width="100" height="100"><br>
-     Title :{{i.title}}<br>
-     Price : {{i.price}}<br>
-     Color : {{i.color}}<br>
-     Availability : {{i.availability}}<br>
-     Tax : 18 %<br>
-     <button><a href="{% url 'addcart' i.id%}">ADD to Cart</a></button><br>
-     {% for l, j in wl.items %} 
-       {%if i.id not in j%}
-         <form action = "{% url 'wishlist' i.id%}" method="POST">
-          {{i}}
-              {% csrf_token %} 
-    
-        
-          <button type = 'submit' style="background-color: white;">Add to Whislist</button><img src="{% static 'x.png' %}" width="30" height="30"
-         </form>
-     {% else %}
-      <form method="POST" action="{% url 'delwl' i.id %}">
-         {% csrf_token %}
-         {{i.id}}
-          <button style="background-color: white;">Already in wishlist</a></button><img src="{% static 'a.jpeg' %}" width="30" height="30"><br><br><br>
-      </form>
-       
-      {% endif %}
-    {% endfor%}
-     
-     
-{% endif %}
+      Brand :{{i.brand}}<br>
+      Image :<img src="{{ i.image.url }}" width="100" height="100"><br>
+      Title :{{i.title}}<br>
+      Price : {{i.price}}<br>
+      Color : {{i.color}}<br>
+      Availability : {{i.availability}}<br>
+      Tax : 18 %<br>
+      <button><a href="{% url 'addcart' i.id%}">ADD to Cart</a></button><br>
+      {% for l, j in wl.items %}
+      {%if i.id not in j%}
+      <form action="{% url 'wishlist' i.id%}" method="POST">
+        {{i}}
+        {% csrf_token %}
 
 
-</div>
+        <button type='submit' style="background-color: white;">Add to Whislist</button><img src="{% static 'x.png' %}"
+          width="30" height="30" </form>
+        {% else %}
+        <form method="POST" action="{% url 'delwl' i.id %}">
+          {% csrf_token %}
+          {{i.id}}
+          <button style="background-color: white;">Already in wishlist</a></button><img src="{% static 'a.jpeg' %}"
+            width="30" height="30"><br><br><br>
+        </form>
 
-</center>
-{% endfor %}
-<button><a href = "{% url 'home' %}">Go back</a></button><br>
+        {% endif %}
+        {% endfor%}
+
+
+        {% endif %}
+
+
+    </div>
+
+  </center>
+  {% endfor %}
+  <button><a href="{% url 'home' %}">Go back</a></button><br>
 </body>
+
 </html>
