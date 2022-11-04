@@ -15,7 +15,8 @@ from django.db.models import Q, F
 
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+import json
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.contrib.sessions.base_session import AbstractBaseSession
 
@@ -313,12 +314,12 @@ class searchapi(ListView):
     model = product
     print('Hiii')
     def render_to_response(self, context, **kwargs):
-        
         search_content = self.request.GET.get('se')
         print(search_content)
         print(self.request.method)
         qs  =self.get_queryset()
         a = qs.filter(Q(availability=True) & Q(
         brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
+        
         queryset = serializers.serialize('json', a, indent =4)
-        return HttpResponse(queryset, content_type='application/json')
+        return JsonResponse(json.loads(queryset), safe = False)
