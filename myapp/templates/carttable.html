@@ -13,12 +13,12 @@
   <img src="http://127.0.0.1:8000/image/{{i.product_id__image}}" width="100" height="100"><br>
   <h3>Product id is :{{i.product_id}}</h3>
   Your cart id is : {{i.id}}<br>
+  This Product price :{{i.selling_price}}<br>
 
 
   <form method="POST" action="{% url 'quantity' i.product_id %}">
-    {{i.product_id}}
     {% csrf_token %}
-    Quantity : <input type="number" value="{{i.quantity}}" name='qn'>
+    Quantity : <input type="number" value="{{i.quantity}}" name='qn' min="1">
     <button>Apply</button>
 
   </form><br><br>

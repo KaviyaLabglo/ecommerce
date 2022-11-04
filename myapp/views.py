@@ -19,6 +19,7 @@ from django.http import HttpResponse, JsonResponse
 import json
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.contrib.sessions.base_session import AbstractBaseSession
+from django.contrib.auth.decorators import user_passes_test
 
 class product_list(ListView):
     model = product
@@ -82,15 +83,15 @@ def cart_add(request, id):
         return redirect('mycart')
         # return render(request, 'carttable.html',{'form':cart_table,'Sum':total_price, 'Tax':tax})
 
-
+@user_passes_test(lambda user:user.id)
 def cart_update(request, id):
-    print(id)
+    print(request.user)
     if request.method == 'POST':
         qn = request.POST.get('qn')
         cart.objects.filter(product=id).update(quantity=int(qn))
         return redirect('mycart')
 
-
+@user_passes_test(lambda user:user.id)
 def cart_del(request, id):
     if request.method == 'POST':
         dele = cart.objects.get(id=id).delete()
@@ -118,7 +119,7 @@ def my_cart(request):
         to = 0
     return render(request, 'carttable.html', {'form': cart_table, 'Sum': total_price, 'pass_id': d, 'Tax': tax, 'total': to})
 
-
+@user_passes_test(lambda user:user.id)
 def order_table(request, id):
     if request.method == 'POST':
         address = request.POST.get('ad')
@@ -176,7 +177,7 @@ def order_history(request):
     d = {'t': total}
     return render(request, 'history.html', {'sel': sel, 'T': d})
 
-
+@user_passes_test(lambda user:user.id)
 def order_del(request, id1, id2):
     if request.method == 'POST':
         print(id1)
@@ -186,7 +187,7 @@ def order_del(request, id1, id2):
         b = order.objects.get(id=id2)
         b.product.remove(a)
 
-        pr = order.objects.filter(order_user=current_user).values(
+        pr = order.objects.filter(Q(order_user=current_user) & Q(id = id2)).values(
             'product__selling_price', 'product__quantity')
         l = []
         if pr:
@@ -284,9 +285,9 @@ class cartapi(ListView):
     def render_to_response(self, context, **kwargs):
         print(context)
         qs  =self.get_queryset()
-        a = qs.filter(Q(user = self.request.user) & Q(is_active = True))
+        filter_qs = qs.filter(Q(user = self.request.user) & Q(is_active = True))
         
-        queryset = serializers.serialize('json', a, indent =4)
+        queryset = serializers.serialize('json', filter_qs, indent =4)
         return HttpResponse(queryset, content_type='application/json')
     
     
@@ -295,31 +296,37 @@ class orderapi(ListView):
     def render_to_response(self, context, **kwargs):
         print(context)
         qs  =self.get_queryset()
-        a = qs.filter(Q(order_user = self.request.user) & Q(order_status = 2))
+        filter_qs = qs.filter(Q(order_user = self.request.user) & Q(order_status = 2))
         
-        queryset = serializers.serialize('json', a, indent =4)
+        queryset = serializers.serialize('json', filter_qs, indent =4)
         return HttpResponse(queryset, content_type='application/json')
     
 class orderapi(ListView):
     model = order
     def render_to_response(self, context, **kwargs):
         print(context)
-        qs  =self.get_queryset()
-        a = qs.filter(Q(order_user = self.request.user) & Q(order_status = 2))
+        qs  = self.get_queryset()
+        filter_qs = qs.filter(Q(order_user = self.request.user) & Q(order_status = 2))
         
-        queryset = serializers.serialize('json', a, indent =4)
+        queryset = serializers.serialize('json', filter_qs, indent =4)
         return HttpResponse(queryset, content_type='application/json')
     
 class searchapi(ListView):
     model = product
-    print('Hiii')
     def render_to_response(self, context, **kwargs):
         search_content = self.request.GET.get('se')
-        print(search_content)
-        print(self.request.method)
+        '''self.request.session['my_values'] = search_content
+        my_car = self.request.session.get('my_values')
+        print(my_car)
+        for key, value in self.request.session.items():
+            print('{} => {}'.format(key, value))'''
+        #del self.request.session['my_values']
+        
+        
         qs  =self.get_queryset()
-        a = qs.filter(Q(availability=True) & Q(
+        filter_qs = qs.filter(Q(availability=True) & Q(
         brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
         
-        queryset = serializers.serialize('json', a, indent =4)
+        queryset = serializers.serialize('json', filter_qs, indent =4)
         return JsonResponse(json.loads(queryset), safe = False)
+    

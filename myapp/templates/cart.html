@@ -14,7 +14,7 @@ price : {{object.price}}<br>
 <form method="POST" action ="{% url 'add' object.id %}"> 
 {% csrf_token %}
 
-Quantity: <input type="number" name = 'quan' value="1"><br>
+Quantity: <input type="number" name = 'quan' value="1" min="1"><br>
 <button>Submit</button> 
 </form>
 This order price is:{{object.price}}<br>
