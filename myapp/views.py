@@ -158,7 +158,7 @@ def order_history(request):
     sel = order.objects.filter(order_user=current_user).values('product__product_id__image', 'order_user',
                                                                'id', 'product__selling_price', 'product__quantity', 'created_on', 'total_order_value', 'product__id')
 
-    #values('product__product_id__image', 'order_user', 'id', 'product__selling_price', 'product__quantity', 'created_on', 'total_order_value', 'product__id')
+   
     pr = order.objects.filter(order_user=current_user.id).values(
         'product__selling_price', 'product__quantity')
     l = []
@@ -311,9 +311,12 @@ class orderapi(ListView):
     
 class searchapi(ListView):
     model = product
+    print('Hiii')
     def render_to_response(self, context, **kwargs):
+        
         search_content = self.request.GET.get('se')
-        print(self.request.session)
+        print(search_content)
+        print(self.request.method)
         qs  =self.get_queryset()
         a = qs.filter(Q(availability=True) & Q(
         brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
