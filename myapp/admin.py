@@ -50,37 +50,10 @@ class a(admin.ModelAdmin):
 
 admin.site.register(wishlist, a)
 
-'''class b(admin.ModelAdmin):
-    fields = ('id','brand_name', 'brand_logo', 'year', 'founder')
-    
-admin.site.register(Brand,b)'''
 
-
-# lookup_field
-'''
-GRAPPELLI_AUTOCOMPLETE_SEARCH_FIELDS = {
-    "myapp": {
-        "order": ("order_user", "product",)
-    }
-}
-
-class orderOptions(admin.ModelAdmin):
-    # define the raw_id_fields
-    raw_id_fields = ('order_user','product',)
-    # define the autocomplete_lookup_fields
-    autocomplete_lookup_fields = {
-        'fk': ['order_user'],
-        'm2m': ['product'],
-    }'''
-
-
-'''class cartInline(admin.TabularInline):
-    model = cart
-    fk_name = "product"
-    
-
-class productAdmin(admin.ModelAdmin):
-    inlines = [
-        cartInline,
-    ]
-    '''
+from django.contrib.sessions.models import Session
+class SessionAdmin(admin.ModelAdmin):
+    def _session_data(self, obj):
+        return obj.get_decoded()
+    list_display = ['session_key', '_session_data', 'expire_date']
+admin.site.register(Session, SessionAdmin)
