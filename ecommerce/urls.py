@@ -18,6 +18,7 @@ from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
 from myapp.views import *
+from myapp import views
 
 
 urlpatterns = [
@@ -27,6 +28,8 @@ urlpatterns = [
    #path('',login_page, name= 'login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path("register/",register, name="register"),
+    
+   
      
 ]
 if settings.DEBUG:
