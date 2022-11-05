@@ -1,24 +1,23 @@
+from django.contrib.sessions.models import Session
 from django.contrib import admin
 from myapp.models import *
 
 
 class S(admin.ModelAdmin):
-    #fields = ('id', 'brand', 'image', 'price',
-     #               'availability', 'color', 'created_on')
+    # fields = ('id', 'brand', 'image', 'price',
+    #               'availability', 'color', 'created_on')
     fieldsets = (
-        (None,{
-            'fields' : (
-                  
-                  'brand', 
-                  'image',
-                  
-                    'availability',
-                    'color',
-                        )
-                    }),
-        )
-    
-    
+        (None, {
+            'fields': (
+
+                'brand',
+                'image',
+
+                'availability',
+                'color',
+            )
+        }),
+    )
 
 
 admin.site.register(product, S)
@@ -31,6 +30,7 @@ class add(admin.ModelAdmin):
     list_editable = ('quantity', 'user',)
     list_filter = ('id', )
     search_fields = ('id', 'user')
+
 
 admin.site.register(cart, add)
 
@@ -51,9 +51,10 @@ class a(admin.ModelAdmin):
 admin.site.register(wishlist, a)
 
 
-from django.contrib.sessions.models import Session
 class SessionAdmin(admin.ModelAdmin):
     def _session_data(self, obj):
         return obj.get_decoded()
     list_display = ['session_key', '_session_data', 'expire_date']
+
+
 admin.site.register(Session, SessionAdmin)
