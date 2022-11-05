@@ -1,5 +1,5 @@
 <html>
-  
+
 <h1>My cart Products</h1>
 
 
@@ -27,63 +27,55 @@
     {% csrf_token %}
     <button>Remove from cart</button><br><br>
   </form>
-  </div>
+</div>
 
-  {% endif %}
-  {% endfor %}
+{% endif %}
+{% endfor %}
 
-  <br>
-  <br>
+<br>
+<br>
 
 
-  {% for i, j in Sum.items%}
+{% for i, j in Sum.items%}
+{% if j is not None %}
+Your Product Price is :{{j}}
+{% endif %}
+{% endfor%}
+
+<div>
+
+  {% for i, j in Tax.items%}
   {% if j is not None %}
-  Your Product Price is :{{j}}
+  Your Tax Price is :{{j}}
+  {% else %}
+  Your cart is empty
+
   {% endif %}
   {% endfor%}
-
-  <div>
-
-    {% for i, j in Tax.items%}
-    {% if j is not None %}
-    Your Tax Price is :{{j}}
-    {% else %}
-    Your cart is empty
-
-    {% endif %}
-    {% endfor%}
-    <br><br>
+  <br><br>
+  
     {% for v, k in total.items%}
     Your Total Price is :{{k}}<br><br>
-    <div>
-      {% for i,j in pass_id.items %}
-      <form action="{% url 'shipping' j%}" method="POST">
-        {% csrf_token %}
-        <button>Shipping</button><br>
-      </form>
-    </div>
+   {% endfor %}
 
-    {% endfor%}
+  <div>
+    {% for i,j in pass_id.items %}
+    <form action="{% url 'shipping' j%}" method="POST">
+      {% csrf_token %}
+      <button>Shipping</button><br>
+    </form>
+  </div>
 
+  
+  <div>
+    {% endfor %}
 
+    </form>
 
-    <div>
+  </div>
 
-
-
-      
-
-
-
-
-      {% endfor %}
-
-      </form>
-
-    </div>
-
-    <br><button><a href="{% url 'home' %}">Go back</a></button>
-    <button ><a href="{% url 'cartapi' %}">Click</a></button>
-
+  <br><button><a href="{% url 'home' %}">Go back</a></button>
+  <button><a href="{% url 'cartapi' %}">Click</a></button>
+  
 
 </html>

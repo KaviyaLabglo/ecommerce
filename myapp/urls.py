@@ -32,6 +32,9 @@ urlpatterns = [
     path('cartapi/', cartapi.as_view(), name = 'cartapi'),
     path('orderapi/', orderapi.as_view(), name='orderapi'),
     path('searchapi/', searchapi.as_view(), name='searchapi'),
+    
+    path('charge/', views.charge, name='charge'),
+   
     ]
   
 

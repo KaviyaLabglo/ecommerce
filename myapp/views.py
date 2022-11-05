@@ -20,6 +20,9 @@ import json
 from django.contrib.sessions.backends.db import SessionStore as DBStore
 from django.contrib.sessions.base_session import AbstractBaseSession
 from django.contrib.auth.decorators import user_passes_test
+import stripe
+from django.conf import settings
+
 
 
 class product_list(ListView):
@@ -117,9 +120,11 @@ def my_cart(request):
     else:
         total = 0
         to = 0
-    return render(request, 'carttable.html', {'form': cart_table, 'Sum': total_price, 'pass_id': d, 'Tax': tax, 'total': to})
+    key = settings.STRIPE_PUBLISHABLE_KEY
+    print(key)
+    return render(request, 'carttable.html', {'form': cart_table, 'Sum': total_price, 'pass_id': d, 'Tax': tax, 'total': to, 'key':key})
 
-
+stripe.api_key = settings.STRIPE_SECRET_KEY
 @user_passes_test(lambda user: user.id)
 def order_table(request, id):
     if request.method == 'POST':
@@ -135,7 +140,7 @@ def order_table(request, id):
 
         tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
             tax=Sum(F('selling_price') * F('quantity')) * 0.18)
-
+        
         if tax['tax']:
             car = cart.objects.filter(
                 Q(user_id=current_user.id) & Q(is_active=True))
@@ -149,11 +154,13 @@ def order_table(request, id):
 
             ret = order.objects.filter(id=ret1['id']).values(
                 'product__product_id__image')
-
+            sum_total = total_price['tot'] + tax['tax']
+            print(sum_total)
+            stripe.PaymentIntent.create(amount= int(sum_total), currency="usd", payment_method_types=["card"])
             return render(request, 'order.html', {'form': ret, 'sum': total_price, 'Tax': tax})
         else:
             return redirect('home')
-
+#charge = stripe.Charge.create(amount = 800, currency = 'inr', description  = "Payment Gateway", source= request.POST['stripeToken'])#
 
 @login_required
 def order_history(request):
@@ -250,7 +257,10 @@ def shipping(request, id):
             is_active=True)).aggregate(tot=Sum(F('selling_price') * F('quantity')))
         tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
             tax=Sum(F('selling_price') * F('quantity')) * 0.18)
-        return render(request, 'shipping.html', {'form': a, 'sum': total_price, 'Tax': tax})
+        key = settings.STRIPE_PUBLISHABLE_KEY
+        t = total_price['tot'] + tax['tax']
+        d = {'T':t}
+        return render(request, 'shipping.html', {'form': a, 'sum': total_price, 'Tax': tax, 'key':key, 'Total': d})
 
 
 def register(request):
@@ -325,3 +335,10 @@ class searchapi(ListView):
             brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
         queryset = serializers.serialize('json', filter_qs, indent=4)
         return JsonResponse(json.loads(queryset), safe=False)
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+def charge(request):
+    if request.method == 'POST':
+        charge = stripe.Charge.create(amount = 800, currency = 'inr', description  = "Payment Gateway", source= request.POST['stripeToken'])
+        return render(request,'charge.html')    
+     

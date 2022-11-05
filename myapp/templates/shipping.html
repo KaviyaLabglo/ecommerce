@@ -4,7 +4,7 @@
 <h1>Welcome</h1>
 {% for i in form %}
   {{i.product_id}}
-  {{i.selling_price}}
+  price : {{i.selling_price}}
   {{i.product_id__image}}
   <img src="http://127.0.0.1:8000/image/{{i.product_id__image}}" width="100" height="100"><br><br>
   
@@ -19,24 +19,33 @@
 {% endfor%}
 </div>
 
-
-
-<div>
 </form>
 
 <form method="POST" action =  "{% url 'order' i.user  %}">
+   {{i.user}}
 {% endfor %}
    {% csrf_token %}
+   
     Address: <input type="text" name="ad" required ><br><br>
     City : <input type="text" name="ci"required ><br><br>
     State :<input type="text" name="st" required><br><br>
     Zip code :<input type="text" name="zi" required><br><br>
-    <button>Place to Order</buton>
-    
-  
+    <div>
+      {% for m,n in Total.items%}
+         Your total is : {{n}}
+         
+      
+      
+     
+   <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{key}}"
+      data-description="payment-gateway" data-amount="{{n}}" data-locale="auto" data-currency = "inr">
+   </script>
+    <div></div>
+ 
 
 </form>
-
+{% endfor %}
+</div>
 </div>
 
 </html>
