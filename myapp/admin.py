@@ -36,8 +36,8 @@ admin.site.register(cart, add)
 
 
 class ord(admin.ModelAdmin):
-    list_display = ('id', 'order_user', 'order_status',  'shipping_address',
-                    'created_on', 'total_product_price', 'total_tax', 'total_order_value')
+    list_display = ('id', 'order_user', 'order_status',  
+                    'created_on')
 
 
 admin.site.register(order, ord)

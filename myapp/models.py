@@ -61,12 +61,8 @@ class cart(TimeStampModel):
 class order(TimeStampModel):
     order_user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ManyToManyField(cart)
-    # User received the product it returns True --> false mean bending
     order_status = models.IntegerField(default=2, choices=ORDER_STATUS_CHOICES)
-    shipping_address = models.TextField(max_length=200)
-    total_product_price = models.IntegerField()
-    total_tax = models.IntegerField()
-    total_order_value = models.IntegerField()
+    
 
     @staticmethod
     def autocomplete_search_fields():
@@ -84,3 +80,12 @@ class wishlist(TimeStampModel):
 
     def __str__(self):
         return "{} ".format(self.id)
+    
+class payment(TimeStampModel):
+    transaction_id = models.TextField(max_length=200)
+    paid_status =  models.BooleanField(default=False)
+    amount = models.IntegerField()
+    email = models.EmailField()
+    order = models.ForeignKey(order, on_delete=models.CASCADE)
+   
+    
