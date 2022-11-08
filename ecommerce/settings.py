@@ -173,3 +173,12 @@ CLEAN_INPUT_TYPES = getattr(settings, "GRAPPELLI_CLEAN_INPUT_TYPES", True)'''
 
 STRIPE_PUBLISHABLE_KEY ='pk_test_51M0fFuSAIY4mQ3LNcYaAmNJMkDTa4dd7QAGgQho9DqBx3LTxBydZWegHcxXYxG1X9jGXVpbyxobd4UR3f34k4Myy00UFxOxYKB'
 STRIPE_SECRET_KEY  = 'sk_test_51M0fFuSAIY4mQ3LNNiKMb27BWlWtK8zRH92qu0NBvvdVjSwXZ2AMbYZ7RDEqwN01N5u1Cc4HCoqCZr0vOdOj5kwY00wzQhqHMW' 
+STRIPE_END_POINT = 'we_1M1T75SAIY4mQ3LNLRZAvqdT'
+
+
+WEBHOOK_EVENTS = (
+    "payment.paid",
+    "payment.cancelled",
+    "payment.refunded",
+    "payment.fulfilled"
+)

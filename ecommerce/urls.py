@@ -28,6 +28,7 @@ urlpatterns = [
    #path('',login_page, name= 'login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path("register/",register, name="register"),
+    path('webhook', views.my_webhook_view),
     
    
      

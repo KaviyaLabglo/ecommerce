@@ -22,7 +22,7 @@ from django.contrib.sessions.base_session import AbstractBaseSession
 from django.contrib.auth.decorators import user_passes_test
 import stripe
 from django.conf import settings
-
+from django.views.decorators.csrf import csrf_exempt
 
 
 class product_list(ListView):
@@ -70,11 +70,11 @@ def cart_form(request, id1):
 def cart_add(request, id):
     if request.method == 'POST':
         quan_tity = request.POST.get('quan')
-        get_price = product.objects.get(id = id)
+        get_price = product.objects.get(id=id)
         price = get_price.price
-        usre_id = User.objects.get(username = request.user)
-        a = cart(user=User.objects.get(id = usre_id.id), product=product.objects.get(
-            id=id), quantity=quan_tity, selling_price = price, addcart_by=request.user)
+        usre_id = User.objects.get(username=request.user)
+        a = cart(user=User.objects.get(id=usre_id.id), product=product.objects.get(
+            id=id), quantity=quan_tity, selling_price=price, addcart_by=request.user)
         #cart_table = cart.objects.filter(user_id = usre_id)
         a.save()
         return redirect('mycart')
@@ -122,11 +122,15 @@ def my_cart(request):
         to = 0
     key = settings.STRIPE_PUBLISHABLE_KEY
     print(key)
-    return render(request, 'carttable.html', {'form': cart_table, 'Sum': total_price, 'pass_id': d, 'Tax': tax, 'total': to, 'key':key})
+    return render(request, 'carttable.html', {'form': cart_table, 'Sum': total_price, 'pass_id': d, 'Tax': tax, 'total': to, 'key': key})
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
 @user_passes_test(lambda user: user.id)
 def order_table(request, id):
+    print("Hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
     if request.method == 'POST':
         address = request.POST.get('ad')
         city = request.POST.get('ci')
@@ -140,7 +144,7 @@ def order_table(request, id):
 
         tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
             tax=Sum(F('selling_price') * F('quantity')) * 0.18)
-        
+
         if tax['tax']:
             car = cart.objects.filter(
                 Q(user_id=current_user.id) & Q(is_active=True))
@@ -156,11 +160,16 @@ def order_table(request, id):
                 'product__product_id__image')
             sum_total = total_price['tot'] + tax['tax']
             print(sum_total)
-            stripe.PaymentIntent.create(amount= int(sum_total), currency="usd", payment_method_types=["card"])
+            a = stripe.PaymentIntent.create(amount=int(
+                sum_total), currency="usd", payment_method_types=["card"])
+           
+            print(a['client_secret'])
+            print('ID', a['id'])
             return render(request, 'order.html', {'form': ret, 'sum': total_price, 'Tax': tax})
         else:
             return redirect('home')
 #charge = stripe.Charge.create(amount = 800, currency = 'inr', description  = "Payment Gateway", source= request.POST['stripeToken'])#
+
 
 @login_required
 def order_history(request):
@@ -259,8 +268,8 @@ def shipping(request, id):
             tax=Sum(F('selling_price') * F('quantity')) * 0.18)
         key = settings.STRIPE_PUBLISHABLE_KEY
         t = total_price['tot'] + tax['tax']
-        d = {'T':t}
-        return render(request, 'shipping.html', {'form': a, 'sum': total_price, 'Tax': tax, 'key':key, 'Total': d})
+        d = {'T': t}
+        return render(request, 'shipping.html', {'form': a, 'sum': total_price, 'Tax': tax, 'key': key, 'Total': d})
 
 
 def register(request):
@@ -335,10 +344,107 @@ class searchapi(ListView):
             brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
         queryset = serializers.serialize('json', filter_qs, indent=4)
         return JsonResponse(json.loads(queryset), safe=False)
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+endpoint_secret = 'whsec_43307a15a7637563e099e6037008b2c2b674cf126fc8ab425e29bede7bd24512'
+
+@csrf_exempt
 def charge(request):
     if request.method == 'POST':
-        charge = stripe.Charge.create(amount = 800, currency = 'inr', description  = "Payment Gateway", source= request.POST['stripeToken'])
-        return render(request,'charge.html')    
+        charge = stripe.Charge.create(
+            amount=800, currency='inr', description="Payment Gateway", source=request.POST['stripeToken'])
+        return render(request, 'charge.html')
+
+
+
+
+@csrf_exempt
+def my_webhook_view(request):
+    payload = request.body.decode('utf-8')
+    print("Webhook")
+    a = json.loads(payload)
+    print(payload)
+    print(a['type'])
+   
+    
+   
+    if a['type'] == "charge.succeeded":
+        session = a['data']['object']
+        customer_email = session["billing_details"]["email"]
+        price = session["amount"] 
+        sessionID = session["id"]
+      
+        
+        payment.objects.create(email = customer_email, amount = price, paid_status = True, transaction_id =sessionID,)
+        
+        print("If condition was working")
+       
+        
+
+    if a['type'] == "charge.failed":
+        session = a['data']['object']
+        customer_email = session["billing_details"]["email"]
+        price = session["amount"] 
+        sessionID = session["id"]
+        payment.objects.create(email = customer_email, amount = price, paid_status =False, transaction_id =sessionID,)
+        
+        
+        
+    return HttpResponse("Webhook Success", status = 200)
+    
+def success(request):
+    return render(request, 'success.html')
+    
+
+
+@csrf_exempt
+def create_checkout_session(request):
+    current_user = request.user
+    domain_url = 'http://localhost:8000/myapp/'
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    get_user = User.objects.get(username=request.user)
+    total_price = cart.objects.filter(Q(user_id=get_user.id) & Q(
+             is_active=True)).aggregate(tot=Sum(F('selling_price') * F('quantity')))
+    tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
+    tot=Sum(F('selling_price') * F('quantity'))*0.18)
+    #qn = cart.objects.filter(Q(user_id=get_user.id) & Q (is_active=True)).values('product_id')
+    
+    if tax['tot']:
+        total = total_price['tot'] + tax['tot']  
+        car = cart.objects.filter(
+                Q(user_id=current_user.id) & Q(is_active=True))
+        s = order.objects.create(order_user=User.objects.get(id=current_user.id))
+        s.product.add(*car)
+       
+    
      
+    id1 = cart.objects.filter(user_id=request.user.id)
+        
+    checkout_session = stripe.checkout.Session.create(
+            client_reference_id=request.user.id if request.user.is_authenticated else None,
+        
+            success_url=domain_url +'success/',
+            cancel_url=domain_url + 'cancelled/',
+            payment_method_types=['card'],
+            line_items=[
+                    {
+                        'price_data': {
+                            'unit_amount': int(total),
+                            'currency': 'inr',
+                            'product_data': {'name': 'Mobile'},
+                        },
+                        'quantity': 1,
+                    }
+                ],
+            
+           
+            mode='payment',
+    )
+   
+    
+    #qn.update(is_active = False)
+    return redirect(checkout_session.url, code = 303)
+        
+        
+        
