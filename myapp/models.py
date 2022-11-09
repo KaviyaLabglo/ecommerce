@@ -62,6 +62,7 @@ class order(TimeStampModel):
     order_user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ManyToManyField(cart)
     order_status = models.IntegerField(default=2, choices=ORDER_STATUS_CHOICES)
+    total_order_amount = models.IntegerField()
     
 
     @staticmethod

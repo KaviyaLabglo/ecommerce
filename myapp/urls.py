@@ -26,7 +26,7 @@ urlpatterns = [
     path('del_wl/<int:id>/', views.wishlist_del, name='delwl'),
     
     
-    path('shipping/<int:id>/', views.shipping, name='shipping'),
+   
     
     path('productapi/', productapi.as_view(), name = 'proapi'),
     path('cartapi/', cartapi.as_view(), name = 'cartapi'),
@@ -36,7 +36,7 @@ urlpatterns = [
     
     
     
-    path('charge/', views.charge),
+    
     path('create-checkout-session/', views.create_checkout_session, name='checkoutsession'),
    # path('endpoint/', views.endpoint, name='endpoint'),
 ]
