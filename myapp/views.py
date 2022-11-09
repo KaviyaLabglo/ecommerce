@@ -175,8 +175,8 @@ def order_table(request, id):
 def order_history(request):
     current_user = request.user
     sel = order.objects.filter(order_user=current_user).values('product__product_id__image', 'order_user',
-                                                               'id', 'product__selling_price', 'product__quantity', 'created_on', 'total_order_value', 'product__id')
-
+                                                               'id', 'product__id')
+    print(sel)
     pr = order.objects.filter(order_user=current_user.id).values(
         'product__selling_price', 'product__quantity')
     l = []
@@ -256,20 +256,7 @@ def wishlist_del(request, id):
         return redirect('home')
 
 
-def shipping(request, id):
-    if request.method == "POST":
-        a = cart.objects.filter(Q(user=id) & Q(is_active=True)).values(
-            'product_id', 'product_id__image', 'selling_price', 'user')
-        current_user = request.user
-        get_user = User.objects.get(username=request.user)
-        total_price = cart.objects.filter(Q(user_id=get_user.id) & Q(
-            is_active=True)).aggregate(tot=Sum(F('selling_price') * F('quantity')))
-        tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
-            tax=Sum(F('selling_price') * F('quantity')) * 0.18)
-        key = settings.STRIPE_PUBLISHABLE_KEY
-        t = total_price['tot'] + tax['tax']
-        d = {'T': t}
-        return render(request, 'shipping.html', {'form': a, 'sum': total_price, 'Tax': tax, 'key': key, 'Total': d})
+
 
 
 def register(request):
@@ -333,12 +320,6 @@ class searchapi(ListView):
 
     def render_to_response(self, context, **kwargs):
         search_content = self.request.GET.get('se')
-        '''self.request.session['my_values'] = search_content
-        my_car = self.request.session.get('my_values')
-        print(my_car)
-        for key, value in self.request.session.items():
-            print('{} => {}'.format(key, value))'''
-        #del self.request.session['my_values']
         qs = self.get_queryset()
         filter_qs = qs.filter(Q(availability=True) & Q(
             brand__brand_name__istartswith=search_content) | Q(title__istartswith=search_content))
@@ -349,49 +330,33 @@ class searchapi(ListView):
 stripe.api_key = settings.STRIPE_SECRET_KEY
 endpoint_secret = 'whsec_43307a15a7637563e099e6037008b2c2b674cf126fc8ab425e29bede7bd24512'
 
-@csrf_exempt
-def charge(request):
-    if request.method == 'POST':
-        charge = stripe.Charge.create(
-            amount=800, currency='inr', description="Payment Gateway", source=request.POST['stripeToken'])
-        return render(request, 'charge.html')
-
-
 
 
 @csrf_exempt
 def my_webhook_view(request):
     payload = request.body.decode('utf-8')
-    print("Webhook")
     a = json.loads(payload)
     print(payload)
-    print(a['type'])
-   
+    new = a["data"]["object"]["id"]
+    print(new)
+    dic = {
+        "Succcess":a["type"] == "checkout.session.completed",
+        "Failure":a["type"] == "charge.failed",
+        "Payment_intend":a["type"] ==  "payment_intent.payment_failed", 
+    }
+    print(dic)
     
-   
-    if a['type'] == "charge.succeeded":
-        session = a['data']['object']
-        customer_email = session["billing_details"]["email"]
-        price = session["amount"] 
-        sessionID = session["id"]
-      
-        
-        payment.objects.create(email = customer_email, amount = price, paid_status = True, transaction_id =sessionID,)
-        
-        print("If condition was working")
-       
-        
-
-    if a['type'] == "charge.failed":
-        session = a['data']['object']
-        customer_email = session["billing_details"]["email"]
-        price = session["amount"] 
-        sessionID = session["id"]
-        payment.objects.create(email = customer_email, amount = price, paid_status =False, transaction_id =sessionID,)
-        
-        
-        
+    if dic["Failure"]:
+        print("Failed payment")
+    if a["type"] == "checkout.session.completed":
+            order_id = a['data']['object']["metadata"]["order_id"]
+            email = a['data']['object']["customer_details"][ "email"]
+            amount = a['data']['object']["amount_total"]
+            order.objects.filter(id = order_id).update(order_status = 1, total_order_amount = amount)
+            x = payment.objects.filter(transaction_id = a["data"]["object"]["id"]).update(paid_status = True, transaction_id = new, email = email, amount = amount)
+     
     return HttpResponse("Webhook Success", status = 200)
+
     
 def success(request):
     return render(request, 'success.html')
@@ -408,19 +373,21 @@ def create_checkout_session(request):
              is_active=True)).aggregate(tot=Sum(F('selling_price') * F('quantity')))
     tax = cart.objects.filter(Q(user_id=get_user.id) & Q(is_active=True)).aggregate(
     tot=Sum(F('selling_price') * F('quantity'))*0.18)
-    #qn = cart.objects.filter(Q(user_id=get_user.id) & Q (is_active=True)).values('product_id')
     
     if tax['tot']:
         total = total_price['tot'] + tax['tot']  
-        car = cart.objects.filter(
-                Q(user_id=current_user.id) & Q(is_active=True))
-        s = order.objects.create(order_user=User.objects.get(id=current_user.id))
-        s.product.add(*car)
        
-    
+    cart_product = cart.objects.filter(
+                Q(user_id=current_user.id) & Q(is_active=True))
      
-    id1 = cart.objects.filter(user_id=request.user.id)
-        
+    
+    o = order.objects.create(order_status = 2, order_user_id = User.objects.get(id = current_user.id).id, total_order_amount = 0)
+    o.product.add(*cart_product)
+    cart.objects.filter()
+    
+    cart_product.update(is_active = False)
+   
+    
     checkout_session = stripe.checkout.Session.create(
             client_reference_id=request.user.id if request.user.is_authenticated else None,
         
@@ -438,12 +405,12 @@ def create_checkout_session(request):
                     }
                 ],
             
-           
+            metadata = {"order_id": o.id},
             mode='payment',
     )
+    pay_create = payment.objects.create(email = "aaa@gmail.com", amount =0 , paid_status =False, transaction_id =checkout_session["id"] ,order_id = o.id)
    
-    
-    #qn.update(is_active = False)
+    print(checkout_session)
     return redirect(checkout_session.url, code = 303)
         
         

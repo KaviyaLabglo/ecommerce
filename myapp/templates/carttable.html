@@ -60,7 +60,7 @@ Your Product Price is :{{j}}
 
   <div>
     {% for i,j in pass_id.items %}
-    <form action="{% url 'shipping' j%}" method="POST">
+    <form action="" method="POST">
       {% csrf_token %}
       <button>Shipping</button><br>
     </form>
