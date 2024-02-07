@@ -4,7 +4,6 @@ from django.shortcuts import redirect, render
 from django.views.generic.list import ListView
 
 from django.shortcuts import render, redirect
-from matplotlib.style import context
 from myapp.models import *
 
 from django.contrib.auth.models import User

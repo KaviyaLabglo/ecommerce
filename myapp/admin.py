@@ -15,6 +15,7 @@ class S(admin.ModelAdmin):
 
                 'availability',
                 'color',
+                'price'
             )
         }),
     )
@@ -58,3 +59,10 @@ class SessionAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Session, SessionAdmin)
+
+
+
+class BranndAdmin(admin.ModelAdmin):
+    list_display = ('id', )
+
+admin.site.register(Brand, BranndAdmin)
